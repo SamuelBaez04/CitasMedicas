@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: citasmed-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: citasmed
+    ports:
+      - "3307:3306"
+    volumes:
+      - citasmed-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - citasmed-network
+
+  app:
+    build: .
+    container_name: citasmed-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: citasmed
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - citasmed-network
+
+networks:
+  citasmed-network:
+    driver: bridge
+
+volumes:
+  citasmed-db-data:
