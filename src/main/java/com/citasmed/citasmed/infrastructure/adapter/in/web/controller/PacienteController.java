@@ -1,9 +1,8 @@
 package com.citasmed.citasmed.infrastructure.adapter.in.web.controller;
 
-
-import com.citasmed.citasmed.domain.model.Paciente;
 import com.citasmed.citasmed.domain.port.in.RegistrarPaciente;
 import com.citasmed.citasmed.infrastructure.adapter.in.web.dto.PacienteRequest;
+import com.citasmed.citasmed.infrastructure.adapter.in.web.dto.PacienteResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +19,9 @@ public class PacienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Paciente registrarPaciente(@Valid @RequestBody PacienteRequest request){
-        return registrarPaciente.registrarPaciente(request.nombre(), request.email(), request.telefono());
+    public PacienteResponse registrarPaciente(@Valid @RequestBody PacienteRequest request){
+        return PacienteResponse.desde(
+                registrarPaciente.registrarPaciente(request.nombre(), request.email(), request.telefono()));
     }
-
-
 
 }
