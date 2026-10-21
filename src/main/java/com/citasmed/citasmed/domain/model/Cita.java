@@ -1,7 +1,5 @@
 package com.citasmed.citasmed.domain.model;
 
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -16,15 +14,25 @@ public class Cita {
     private EstadoCita estado;
 
     public Cita(UUID id, Paciente paciente, Medico medico, LocalDateTime fechaHora, String motivo) {
+        this(id, paciente, medico, validarFecha(fechaHora), motivo, EstadoCita.PENDIENTE);
+    }
+
+    private Cita(UUID id, Paciente paciente, Medico medico, LocalDateTime fechaHora,
+                 String motivo, EstadoCita estado) {
         this.id = Objects.requireNonNull(id, "El id no puede ser nulo");
         this.paciente = Objects.requireNonNull(paciente, "El paciente es obligatorio");
         this.medico = Objects.requireNonNull(medico, "El médico es obligatorio");
-        this.fechaHora = validarFecha(fechaHora);
+        this.fechaHora = Objects.requireNonNull(fechaHora, "La fecha de la cita es obligatoria");
         this.motivo = motivo;
-        this.estado = EstadoCita.PENDIENTE;
+        this.estado = Objects.requireNonNull(estado, "El estado es obligatorio");
     }
 
-    private LocalDateTime validarFecha(LocalDateTime fechaHora){
+    public static Cita reconstruir(UUID id, Paciente paciente, Medico medico,
+                                   LocalDateTime fechaHora, String motivo, EstadoCita estado) {
+        return new Cita(id, paciente, medico, fechaHora, motivo, estado);
+    }
+
+    private static LocalDateTime validarFecha(LocalDateTime fechaHora){
         if(fechaHora == null){
             throw new IllegalArgumentException("La fecha de la cita es obligatoria");
         }
@@ -56,8 +64,10 @@ public class Cita {
     }
 
     public boolean requiereRecordatorio(){
-        LocalDateTime en24hrs = LocalDateTime.now().plusHours(24);
-        return estado == EstadoCita.CONFIRMADA && fechaHora.isBefore(en24hrs);
+        LocalDateTime ahora = LocalDateTime.now();
+        return estado == EstadoCita.CONFIRMADA
+                && fechaHora.isAfter(ahora)
+                && fechaHora.isBefore(ahora.plusHours(24));
     }
 
     public UUID getId() { return id; }
@@ -66,6 +76,5 @@ public class Cita {
     public LocalDateTime getFechaHora() { return fechaHora; }
     public String getMotivo() { return motivo; }
     public EstadoCita getEstado() { return estado; }
-
 
 }

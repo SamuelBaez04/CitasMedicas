@@ -25,7 +25,6 @@ public class CitaEntity {
 
     private String motivo;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private String estado;
 
