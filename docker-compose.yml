@@ -4,14 +4,14 @@ services:
     container_name: citasmed-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: citasmed
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env}
+      MYSQL_DATABASE: ${DB_NAME:-citasmed}
     ports:
       - "3307:3306"
     volumes:
       - citasmed-db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,9 +25,9 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 3306
-      DB_NAME: citasmed
+      DB_NAME: ${DB_NAME:-citasmed}
       DB_USER: root
-      DB_PASSWORD: rootpassword
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env}
     ports:
       - "8080:8080"
     depends_on:
