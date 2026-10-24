@@ -6,6 +6,7 @@ import com.citasmed.citasmed.domain.port.in.ConsultarCita;
 import com.citasmed.citasmed.domain.port.in.GestionarCita;
 import com.citasmed.citasmed.infrastructure.adapter.in.web.dto.AgendarCitaRequest;
 import com.citasmed.citasmed.infrastructure.adapter.in.web.dto.CitaResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Tag(name  = "Citas", description = "Agendar, gestionar y consultar Citas")
 @RestController
 @RequestMapping("/api/citas")
 public class CitaController {
