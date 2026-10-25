@@ -51,7 +51,7 @@ public class CitaController {
 
     @PatchMapping("/{id}/completar")
     public CitaResponse completarCita(@PathVariable UUID id){
-        return CitaResponse.desde(gestionarCita.confirmar(id));
+        return CitaResponse.desde(gestionarCita.completar(id));
     }
 
     @GetMapping("/paciente/{idPaciente}")
