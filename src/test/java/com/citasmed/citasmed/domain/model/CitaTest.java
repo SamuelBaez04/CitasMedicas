@@ -111,4 +111,12 @@ class CitaTest {
 
         assertThat(cita.requiereRecordatorio()).isFalse();
     }
+
+    @Test
+    void noRequiereRecordatorioSiYaFueEnviado(){
+        Cita cita = Cita.reconstruir(UUID.randomUUID(), paciente, medico,
+                LocalDateTime.now().plusHours(5), "Control,", EstadoCita.CONFIRMADA, true);
+        assertThat(cita.requiereRecordatorio()).isFalse();
+    }
+
 }

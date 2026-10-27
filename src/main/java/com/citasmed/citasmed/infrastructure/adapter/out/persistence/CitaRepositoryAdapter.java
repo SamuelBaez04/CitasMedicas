@@ -53,13 +53,12 @@ public class CitaRepositoryAdapter implements CitaRepository {
                 .toList();
     }
 
-    // El filtro se hace en la base de datos (estado + próximas 24 horas),
-    // en vez de traer todas las citas a memoria.
+
     @Override
     public List<Cita> buscarQueRequierenRecordatorio() {
         LocalDateTime ahora = LocalDateTime.now();
         return jpaRepository
-                .findByEstadoAndFechaHoraBetween(EstadoCita.CONFIRMADA.name(), ahora, ahora.plusHours(24))
+                .findByEstadoAndRecordatorioEnviadoFalseAndFechaHoraBetween(EstadoCita.CONFIRMADA.name(), ahora, ahora.plusHours(24))
                 .stream()
                 .map(CitaMapper::aDominio)
                 .toList();
