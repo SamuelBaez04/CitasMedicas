@@ -1,4 +1,4 @@
-package com.citasmed.citasmed.domain.port.in.messaging;
+package com.citasmed.citasmed.infrastructure.adapter.in.messaging;
 
 import com.citasmed.citasmed.domain.port.in.ProcesarRecordatorio;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class RecordatorioListener {
         this.procesarRecordatorio = procesarRecordatorio;
     }
 
-    @RabbitListener(queues = "${citasmed.recordatorios.colas}")
+    @RabbitListener(queues = "${citasmed.recordatorios.cola}")
     public void recibir(String citaId){
         UUID id;
         try{
