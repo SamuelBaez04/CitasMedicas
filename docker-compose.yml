@@ -17,6 +17,23 @@ services:
       retries: 5
     networks:
       - citasmed-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: citasmed-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-citasmed}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:123456789}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - citasmed-network
 
   app:
     build: .
@@ -27,12 +44,18 @@ services:
       DB_PORT: 3306
       DB_NAME: ${DB_NAME:-citasmed}
       DB_USER: root
-      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env}
+      DB_PASSWORD: ${DB_PASSWORD:123456789}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-citasmed}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:123456789}
       TZ: America/Bogota
     ports:
       - "8080:8080"
     depends_on:
       db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     networks:
       - citasmed-network
