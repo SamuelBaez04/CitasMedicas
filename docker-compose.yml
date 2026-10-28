@@ -28,6 +28,7 @@ services:
       DB_NAME: ${DB_NAME:-citasmed}
       DB_USER: root
       DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env}
+      TZ: America/Bogota
     ports:
       - "8080:8080"
     depends_on:

@@ -28,17 +28,21 @@ public class CitaEntity {
     @Column(nullable = false)
     private String estado;
 
+    @Column(name = "recordatorio_enviado", nullable = false)
+    private boolean recordatorioEnviado;
+
     protected CitaEntity() {
     }
 
     public CitaEntity(UUID id, PacienteEntity paciente, MedicoEntity medico,
-                      LocalDateTime fechaHora, String motivo, String estado) {
+                      LocalDateTime fechaHora, String motivo, String estado, boolean recordatorioEnviado) {
         this.id = id;
         this.paciente = paciente;
         this.medico = medico;
         this.fechaHora = fechaHora;
         this.motivo = motivo;
         this.estado = estado;
+        this.recordatorioEnviado = recordatorioEnviado;
     }
 
     public UUID getId() { return id; }
@@ -47,4 +51,5 @@ public class CitaEntity {
     public LocalDateTime getFechaHora() { return fechaHora; }
     public String getMotivo() { return motivo; }
     public String getEstado() { return estado; }
+    public boolean isRecordatorioEnviado(){ return recordatorioEnviado; }
 }

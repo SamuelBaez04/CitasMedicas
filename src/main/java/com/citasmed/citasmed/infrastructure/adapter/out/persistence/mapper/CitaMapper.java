@@ -13,7 +13,8 @@ public class CitaMapper {
                 MedicoMapper.aEntity(cita.getMedico()),
                 cita.getFechaHora(),
                 cita.getMotivo(),
-                cita.getEstado().name()
+                cita.getEstado().name(),
+                cita.isRecordatorioEnviado()
         );
     }
 
@@ -24,7 +25,8 @@ public class CitaMapper {
                 MedicoMapper.aDominio(entity.getMedico()),
                 entity.getFechaHora(),
                 entity.getMotivo(),
-                EstadoCita.valueOf(entity.getEstado())
+                EstadoCita.valueOf(entity.getEstado()),
+                entity.isRecordatorioEnviado()
         );
     }
 
