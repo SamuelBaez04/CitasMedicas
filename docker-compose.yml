@@ -34,6 +34,15 @@ services:
       retries: 10
     networks:
       - citasmed-network
+  mailpit:
+    image: axllent/mailpit
+    container_name: citasmed_mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - citasmed-network
 
   app:
     build: .
@@ -49,6 +58,8 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USER: ${RABBITMQ_USER:-citasmed}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Define RABBITMQ_PASSWORD en el archivo .env}
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
       TZ: America/Bogota
     ports:
       - "8080:8080"
@@ -57,6 +68,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     networks:
       - citasmed-network
 
