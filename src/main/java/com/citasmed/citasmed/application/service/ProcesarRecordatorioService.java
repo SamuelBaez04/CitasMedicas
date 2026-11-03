@@ -34,7 +34,7 @@ public class ProcesarRecordatorioService implements ProcesarRecordatorio {
            return;
         }
 
-        log.info("Procesando recordatorio de la cita {} para {}", citaId, cita.getPaciente());
+        log.info("Procesando recordatorio de la cita {} para {}", citaId, cita.getPaciente().getEmail());
 
     }
 
