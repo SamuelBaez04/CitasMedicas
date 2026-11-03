@@ -45,6 +45,37 @@ src/main/java/com/citasmed/citasmed
 
 Las reglas de esta arquitectura se verifican automáticamente con **ArchUnit** (por ejemplo, el dominio no puede importar Spring ni JPA): si alguien las rompe, el build falla.
 
+## Recordatorios de citas
+
+Las citas **confirmadas** que ocurren en las próximas 24 horas reciben un recordatorio por correo, de forma asíncrona:
+
+```mermaid
+flowchart LR
+    S[Scheduler<br/>cada minuto] --> U[Caso de uso<br/>EnviarRecordatorios]
+    U -->|id de la cita| Q[(RabbitMQ<br/>recordatorios.citas)]
+    Q --> L[Listener]
+    L --> P[Caso de uso<br/>ProcesarRecordatorio]
+    P --> E[Puerto EmailSender]
+    E --> M[SMTP / Mailpit]
+```
+
+Decisiones de diseño:
+
+- **El mensaje lleva solo el id de la cita.** El consumidor lee el estado actual desde la base de datos y descarta el recordatorio si la cita fue cancelada mientras esperaba en la cola.
+- **At-least-once.** Primero se publica y después se marca `recordatorioEnviado`. Si RabbitMQ está caído, la cita no se marca y se reintenta en el siguiente ciclo.
+- **Reintentos acotados** en el consumidor (3 intentos con espera creciente) para que un mensaje problemático no bloquee la cola.
+- **Hexagonal:** el scheduler y el listener son adaptadores de entrada; RabbitMQ y SMTP son adaptadores de salida detrás de puertos (`NotificationPublisher`, `EmailSender`).
+
+## Servicios locales
+
+Al levantar con `docker compose up --build`:
+
+| Servicio | URL |
+|---|---|
+| API + Swagger UI | http://localhost:8080/swagger-ui/index.html |
+| RabbitMQ (panel) | http://localhost:15672 |
+| Mailpit (correos de prueba) | http://localhost:8025 |
+
 ## Reglas de negocio
 
 - Una cita nueva nace en estado `PENDIENTE` y no puede agendarse en el pasado.
@@ -101,12 +132,13 @@ El pipeline de GitHub Actions (`.github/workflows/ci.yml`) corre `./gradlew buil
 - [x] Dominio, casos de uso, API REST y persistencia con MySQL
 - [x] Docker Compose
 - [x] Tests unitarios, de integración y de arquitectura + CI
+- [x] Documentación OpenAPI (Swagger)
+- [x] Recordatorios asíncronos: tarea programada + RabbitMQ + correo SMTP (Mailpit)
 - [ ] Migraciones versionadas con Flyway (hoy se usa `ddl-auto=update`)
-- [ ] Recordatorios asíncronos: RabbitMQ + tarea programada + MailHog
 - [ ] Autenticación con JWT y roles (paciente / médico)
-- [ ] Documentación OpenAPI (Swagger)
 - [ ] Frontend mínimo y despliegue
 
 ## Limitación conocida
 
 La validación de disponibilidad del médico se hace en la capa de aplicación, por lo que dos peticiones simultáneas para el mismo horario podrían agendarse a la vez. Está pendiente protegerlo a nivel de base de datos.
+- Si el envío del correo falla los 3 intentos, el recordatorio se pierde (la cita ya quedó marcada como enviada). Mejora prevista: cola de mensajes fallidos (dead-letter queue).
